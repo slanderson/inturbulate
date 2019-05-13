@@ -36,6 +36,11 @@ def make_batches(data, width, height, batch_size=64):
         img_reshaped = img_set.transpose(2, 0, 1).reshape(N, n_h, height, n_w, width)
         stacked = img_reshaped.transpose(0, 1, 3, 2, 4).reshape(num_batches, batch_size, 1, height, width)
         img = stacked if img is None else np.concatenate((img, stacked), axis=0)
+    
+    num_batches = img.shape[0]
+    img = img.reshape(num_batches*batch_size, 1, height, width)
+    np.random.shuffle(img)
+    img = img.reshape(num_batches, batch_size, 1, height, width)        
     return img
 
 def make_shifted_copies(data, h_shift, w_shift):
