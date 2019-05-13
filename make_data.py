@@ -38,8 +38,13 @@ def make_batches(data, width, height, batch_size=64):
         img = stacked if img is None else np.concatenate((img, stacked), axis=0)
     return img
 
-
 def make_shifted_copies(data, h_shift, w_shift):
+    """ 
+    Takes in a tuple of image-sets each of shape (H, W, N) and makes copies of each
+    image-set after shifting it left, right, and both left and right.  Each of these
+    shifted images is added to the original tuple of image-sets, and this augmented tuple
+    is returned.
+    """
     shifted = tuple() 
     for img in data:
         shift_down = np.concatenate((img[h_shift:, :, :], img[:h_shift, :, :]), axis=0)
@@ -49,14 +54,19 @@ def make_shifted_copies(data, h_shift, w_shift):
     return shifted
 
 def main():
+    # Load the data
     mat_dict = sio.loadmat('hw2q11')
     midplane = mat_dict['theta_midplane']
     nearwall = mat_dict['theta_nearwall']
+
+    # Process the data
     data = (midplane, nearwall)
     augmented = make_shifted_copies(data, HEIGHT // 2, WIDTH // 2)
     batches = make_batches(augmented, WIDTH, HEIGHT)
     batches -= batches.min()
     batches /= batches.max()
+
+    # save the processed and batches data
     np.save('turb_batches', batches)
 
 
